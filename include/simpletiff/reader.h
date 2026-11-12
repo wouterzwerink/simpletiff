@@ -30,6 +30,20 @@ namespace simpletiff {
 
 using aifocore::Result;
 
+/// JPEG decoder settings.
+enum class JpegDecodeMode : uint8_t {
+  /// Fast integer IDCT (`JDCT_IFAST`), no fancy upsampling, no block
+  /// smoothing. The default.
+  kFast,
+  /// libjpeg's defaults (`JDCT_ISLOW` and fancy upsampling), as used by
+  /// libtiff, OpenSlide and Pillow. Slower, but pixel-identical to them.
+  kLibjpeg,
+};
+
+/// Whether this build's JPEG backend honours `mode`. Always true for
+/// `kFast`; false for `kLibjpeg` on the jpgd backend.
+bool JpegDecodeModeSupported(JpegDecodeMode mode);
+
 /// Decode context for buffer reuse during tile/strip reading
 ///
 /// This makes allocation overhead explicit and eliminates hidden thread_local
@@ -43,6 +57,10 @@ struct DecodeContext {
   // Lazily initialized on first use
   jpeg_decompress_struct* jpeg_cinfo = nullptr;
   jpeg_error_mgr* jpeg_err = nullptr;
+
+  /// JPEG decoder settings used by every decode through this context.
+  /// Ignored by the jpgd backend (see `JpegDecodeModeSupported`).
+  JpegDecodeMode jpeg_decode_mode = JpegDecodeMode::kFast;
 
   /// Constructor
   DecodeContext();

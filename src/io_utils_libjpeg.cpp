@@ -28,6 +28,8 @@
 
 namespace simpletiff {
 
+bool JpegDecodeModeSupported(JpegDecodeMode /*mode*/) { return true; }
+
 DecodeContext::DecodeContext() = default;
 
 DecodeContext::~DecodeContext() {
@@ -42,7 +44,8 @@ DecodeContext::DecodeContext(DecodeContext&& other) noexcept
     : jpeg_stream_buffer(std::move(other.jpeg_stream_buffer)),
       temp_buffer(std::move(other.temp_buffer)),
       jpeg_cinfo(other.jpeg_cinfo),
-      jpeg_err(other.jpeg_err) {
+      jpeg_err(other.jpeg_err),
+      jpeg_decode_mode(other.jpeg_decode_mode) {
   other.jpeg_cinfo = nullptr;
   other.jpeg_err = nullptr;
 }
@@ -59,6 +62,7 @@ DecodeContext& DecodeContext::operator=(DecodeContext&& other) noexcept {
     temp_buffer = std::move(other.temp_buffer);
     jpeg_cinfo = other.jpeg_cinfo;
     jpeg_err = other.jpeg_err;
+    jpeg_decode_mode = other.jpeg_decode_mode;
 
     other.jpeg_cinfo = nullptr;
     other.jpeg_err = nullptr;
@@ -124,9 +128,13 @@ bool DecodeJpeg(DecodeContext& ctx, std::span<const uint8_t> jpeg_data,
     cinfo.out_color_space = JCS_RGB;
   }
 
-  cinfo.dct_method = JDCT_IFAST;      // Fast integer DCT.
-  cinfo.do_fancy_upsampling = FALSE;  // Speed win on YCbCr 4:2:0.
-  cinfo.do_block_smoothing = FALSE;   // Disable smoothing for speed.
+  // jpeg_read_header resets these to libjpeg's defaults on every call, so
+  // kLibjpeg leaves them untouched.
+  if (ctx.jpeg_decode_mode == JpegDecodeMode::kFast) {
+    cinfo.dct_method = JDCT_IFAST;      // Fast integer DCT.
+    cinfo.do_fancy_upsampling = FALSE;  // Speed win on YCbCr 4:2:0.
+    cinfo.do_block_smoothing = FALSE;   // Disable smoothing for speed.
+  }
 
   if (jpeg_start_decompress(&cinfo) != TRUE) {
     jpeg_abort_decompress(&cinfo);

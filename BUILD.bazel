@@ -184,6 +184,22 @@ cc_test(
 )
 
 cc_test(
+    name = "jpeg_decode_mode_test",
+    srcs = ["tests/jpeg_decode_mode_test.cpp"],
+    copts = select({
+        ":use_jpgd": ["-DSIMPLETIFF_JPEG_BACKEND_JPGD"],
+        "//conditions:default": [],
+    }),
+    deps = [
+        ":simpletiff_lib",
+        "@googletest//:gtest_main",
+    ] + select({
+        ":use_jpgd": [],
+        "//conditions:default": ["@libjpeg_turbo//:jpeg"],
+    }),
+)
+
+cc_test(
     name = "ccitt_test",
     srcs = ["src/ccitt_test.cpp"],
     deps = [

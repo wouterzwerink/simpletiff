@@ -15,10 +15,17 @@ if gtest_dep.found()
     'reader_test' : '../src/reader_test.cpp',
     'ccitt_test' : '../src/ccitt_test.cpp',
     'jpeg2000_sycc_pack_test' : 'jpeg2000_sycc_pack_test.cpp',
+    'jpeg_decode_mode_test' : 'jpeg_decode_mode_test.cpp',
   }
+
+  test_args = []
+  if get_option('jpeg_decoder') == 'jpgd'
+    test_args += '-DSIMPLETIFF_JPEG_BACKEND_JPGD'
+  endif
 
   foreach test_name, test_src : simpletiff_tests
     exe = executable(test_name, test_src,
+      cpp_args : test_args,
       dependencies : [simpletiff_dep, gtest_dep])
     test(test_name, exe)
   endforeach

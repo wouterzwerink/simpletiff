@@ -28,6 +28,11 @@ namespace simpletiff {
 // `DecodeContext` is declared in reader.h with libjpeg-shaped state fields
 // (`jpeg_cinfo`, `jpeg_err`). jpgd doesn't need any persistent decoder
 // state, so we just keep those nulled out and reuse the buffer fields.
+// jpgd has no IDCT or upsampling choice: it only honours kFast.
+bool JpegDecodeModeSupported(JpegDecodeMode mode) {
+  return mode == JpegDecodeMode::kFast;
+}
+
 DecodeContext::DecodeContext() = default;
 DecodeContext::~DecodeContext() = default;
 
@@ -35,12 +40,14 @@ DecodeContext::DecodeContext(DecodeContext&& other) noexcept
     : jpeg_stream_buffer(std::move(other.jpeg_stream_buffer)),
       temp_buffer(std::move(other.temp_buffer)),
       jpeg_cinfo(nullptr),
-      jpeg_err(nullptr) {}
+      jpeg_err(nullptr),
+      jpeg_decode_mode(other.jpeg_decode_mode) {}
 
 DecodeContext& DecodeContext::operator=(DecodeContext&& other) noexcept {
   if (this != &other) {
     jpeg_stream_buffer = std::move(other.jpeg_stream_buffer);
     temp_buffer = std::move(other.temp_buffer);
+    jpeg_decode_mode = other.jpeg_decode_mode;
   }
   return *this;
 }

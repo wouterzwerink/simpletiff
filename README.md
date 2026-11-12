@@ -163,6 +163,7 @@ switch (page.storage) {
 
 - **Tiled files**: Use `ReadPage` with small ROIs for best performance
 - **Decode context**: Reuse `DecodeContext` across multiple reads to avoid reallocating working buffers
+- **JPEG decode mode**: JPEG decodes with a fast integer IDCT and no fancy upsampling by default. Set `ctx.jpeg_decode_mode = simpletiff::JpegDecodeMode::kLibjpeg` for libjpeg's defaults, which are pixel-identical to libtiff and OpenSlide, at a few percent of speed. The jpgd backend only supports the fast mode (`JpegDecodeModeSupported`)
 - **JPEG tables**: Cached once per page in the index (shared across threads), then reused for all tiles/strips
 - **Threading**: Each thread needs its own `DecodeContext` for working buffers (thread-local storage recommended)
 - **I/O**: Uses `pread()` for thread-safe, lock-free random access
