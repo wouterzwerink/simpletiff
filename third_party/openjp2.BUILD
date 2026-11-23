@@ -8,9 +8,9 @@ exports_files(["LICENSE"])
 
 VERSION_MAJOR = "2"
 
-VERSION_MINOR = "4"
+VERSION_MINOR = "5"
 
-VERSION_MICRO = "0"
+VERSION_MICRO = "4"
 
 cc_library(
     name = "openjp2",
@@ -21,6 +21,7 @@ cc_library(
         "src/lib/openjp2/dwt.c",
         "src/lib/openjp2/event.c",
         "src/lib/openjp2/function_list.c",
+        "src/lib/openjp2/ht_dec.c",
         "src/lib/openjp2/image.c",
         "src/lib/openjp2/invert.c",
         "src/lib/openjp2/j2k.c",
@@ -65,12 +66,11 @@ cc_library(
         "src/lib/openjp2/opj_common.h",
         "src/lib/openjp2/opj_includes.h",
         "src/lib/openjp2/opj_intmath.h",
-        "src/lib/openjp2/opj_inttypes.h",
         "src/lib/openjp2/opj_malloc.h",
-        "src/lib/openjp2/opj_stdint.h",
         "src/lib/openjp2/pi.h",
         "src/lib/openjp2/sparse_array.h",
         "src/lib/openjp2/t1.h",
+        "src/lib/openjp2/t1_ht_luts.h",
         "src/lib/openjp2/t1_luts.h",
         "src/lib/openjp2/t2.h",
         "src/lib/openjp2/tcd.h",
@@ -109,7 +109,7 @@ genrule(
     cmd = "\n".join([
         "cat <<'EOF' >$@",
         "#define OPJ_HAVE_INTTYPES_H 1",
-        '#define OPJ_PACKAGE_VERSION "2.3.1"',
+        '#define OPJ_PACKAGE_VERSION "{}.{}.{}"'.format(VERSION_MAJOR, VERSION_MINOR, VERSION_MICRO),
         "#define USE_JPIP 1",
         "",
         "#if !defined(_MSC_VER) && !defined(_WIN32)",

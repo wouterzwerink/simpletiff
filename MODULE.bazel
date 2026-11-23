@@ -49,9 +49,9 @@ http_archive = use_repo_rule("@bazel_tools//tools/build_defs/repo:http.bzl", "ht
 http_archive(
     name = "openjp2",
     build_file = "//third_party:openjp2.BUILD",
-    sha256 = "8702ba68b442657f11aaeb2b338443ca8d5fb95b0d845757968a7be31ef7f16d",
-    strip_prefix = "openjpeg-2.4.0",
-    urls = ["https://github.com/uclouvain/openjpeg/archive/v2.4.0.tar.gz"],
+    sha256 = "a695fbe19c0165f295a8531b1e4e855cd94d0875d2f88ec4b61080677e27188a",
+    strip_prefix = "openjpeg-2.5.4",
+    urls = ["https://github.com/uclouvain/openjpeg/archive/v2.5.4.tar.gz"],
 )
 
 bazel_dep(name = "libwebp", version = "1.5.0")
